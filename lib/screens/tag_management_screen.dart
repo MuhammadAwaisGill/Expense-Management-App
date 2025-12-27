@@ -36,6 +36,14 @@ class _TagManagementScreenState extends State<TagManagementScreen> {
   }
 
   Future<void> _confirmAndDeleteTag(BuildContext context, Tag tag) async {
+    // Prevent deletion of default tag
+    if (tag.id == -1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Cannot delete the default "None" tag.')),
+      );
+      return;
+    }
+
     final bool? shouldDelete = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -63,6 +71,14 @@ class _TagManagementScreenState extends State<TagManagementScreen> {
   }
 
   void _showTagForm({Tag? tag}) {
+    // Prevent editing of default tag
+    if (tag != null && tag.id == -1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Cannot edit the default "None" tag.')),
+      );
+      return;
+    }
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -108,10 +124,17 @@ class _TagManagementScreenState extends State<TagManagementScreen> {
                   itemCount: tags.length,
                   itemBuilder: (context, index) {
                     final tag = tags[index];
+                    final isDefault = tag.id == -1;
+
                     return ListTile(
                       leading: const Icon(Icons.label_outline, color: Colors.blueGrey),
                       title: Text(tag.name),
-                      trailing: Row(
+                      trailing: isDefault
+                          ? const Chip(
+                        label: Text('Default', style: TextStyle(fontSize: 10)),
+                        backgroundColor: Colors.grey,
+                      )
+                          : Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(

@@ -3,6 +3,7 @@ import 'package:expense_management_app/models/expense.dart';
 import 'package:expense_management_app/models/tag.dart';
 import 'package:expense_management_app/providers/expense_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class AddExpenseScreen extends StatefulWidget {
@@ -26,43 +27,38 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   Tag? _selectedTag;
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_isInitialized) {
-        final provider = Provider.of<ExpenseProvider>(context, listen: false);
-        setState(() {
-          _selectedCategory = provider.defaultCategory;
-          _selectedTag = provider.defaultTag;
-        });
-      }
-    });
-  }
-
-  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final Expense? expense = ModalRoute.of(context)?.settings.arguments as Expense?;
+    if (!_isInitialized) {
+      final provider = Provider.of<ExpenseProvider>(context, listen: false);
+      final Expense? expense = ModalRoute.of(context)?.settings.arguments as Expense?;
 
-    if (expense != null && !_isInitialized) {
-      _isEditMode = true;
-      _editingExpenseId = expense.id;
+      if (expense != null) {
+        _isEditMode = true;
+        _editingExpenseId = expense.id;
 
-      _titleController.text = expense.title;
-      _amountController.text = expense.amount.toString();
-      _selectedCategory = expense.category;
-      _selectedTag = expense.tag;
+        _titleController.text = expense.title;
+        _amountController.text = expense.amount.toStringAsFixed(2);
+        _selectedCategory = expense.category;
+        _selectedTag = expense.tag;
 
-      try {
-        final parts = expense.date.split('/');
-        _selectedDateTime = DateTime(
-          int.parse(parts[2]),
-          int.parse(parts[1]),
-          int.parse(parts[0]),
-        );
-      } catch (e) {
-        _selectedDateTime = DateTime.now();
+        try {
+          final parts = expense.date.split('/');
+          if (parts.length == 3) {
+            _selectedDateTime = DateTime(
+              int.parse(parts[2]),
+              int.parse(parts[1]),
+              int.parse(parts[0]),
+            );
+          }
+        } catch (e) {
+          _selectedDateTime = DateTime.now();
+        }
+      } else {
+        // Initialize with defaults for new expense
+        _selectedCategory = provider.defaultCategory;
+        _selectedTag = provider.defaultTag;
       }
 
       _isInitialized = true;
@@ -165,14 +161,18 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               TextFormField(
                 controller: _amountController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                ],
                 decoration: const InputDecoration(
-                  labelText: 'Enter amount (e.g, 100)',
+                  labelText: 'Enter amount (e.g, 100.50)',
                   prefixIcon: Icon(Icons.monetization_on),
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) return 'Please enter an amount.';
-                  if (double.tryParse(value) == null || double.parse(value) <= 0) {
+                  final amount = double.tryParse(value);
+                  if (amount == null || amount <= 0) {
                     return 'Please enter a valid positive amount.';
                   }
                   return null;
@@ -197,19 +197,14 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               ),
               const SizedBox(height: 20),
 
-              const Text('Category (Optional)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const Text('Category', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               DropdownButtonFormField<Category>(
                 decoration: const InputDecoration(
                   labelText: 'Select Category',
                   border: OutlineInputBorder(),
                 ),
-                value: _selectedCategory != null
-                    ? availableCategories.firstWhere(
-                      (cat) => cat.id == _selectedCategory!.id,
-                  orElse: () => availableCategories.first,
-                )
-                    : availableCategories.isNotEmpty ? availableCategories.first : null,
+                value: _selectedCategory,
                 isExpanded: true,
                 items: availableCategories.map((category) {
                   return DropdownMenuItem<Category>(
@@ -229,19 +224,14 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               ),
               const SizedBox(height: 20),
 
-              const Text('Tag (Optional)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const Text('Tag', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               DropdownButtonFormField<Tag>(
                 decoration: const InputDecoration(
                   labelText: 'Select Tag',
                   border: OutlineInputBorder(),
                 ),
-                value: _selectedTag != null
-                    ? availableTags.firstWhere(
-                      (tag) => tag.id == _selectedTag!.id,
-                  orElse: () => availableTags.first,
-                )
-                    : availableTags.isNotEmpty ? availableTags.first : null,
+                value: _selectedTag,
                 isExpanded: true,
                 items: availableTags.map((tag) {
                   return DropdownMenuItem<Tag>(

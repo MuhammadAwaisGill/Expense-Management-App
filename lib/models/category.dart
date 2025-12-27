@@ -1,11 +1,9 @@
-import 'package:flutter/material.dart';
-
 class Category {
   int id;
   String name;
   int colorValue;
 
-  Category ({
+  Category({
     required this.id,
     required this.name,
     required this.colorValue,
@@ -26,4 +24,14 @@ class Category {
       colorValue: map['colorValue'] as int,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is Category &&
+              runtimeType == other.runtimeType &&
+              id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }

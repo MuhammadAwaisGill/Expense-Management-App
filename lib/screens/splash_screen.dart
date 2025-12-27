@@ -44,10 +44,18 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   }
 
   Future<void> _loadData() async {
-    await Provider.of<ExpenseProvider>(context, listen: false).loadData();
-    await Future.delayed(const Duration(seconds: 3));
-    if (mounted) {
-      Navigator.pushReplacementNamed(context, "/home");
+    try {
+      await Provider.of<ExpenseProvider>(context, listen: false).loadData();
+      await Future.delayed(const Duration(seconds: 3));
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, "/home");
+      }
+    } catch (e) {
+      debugPrint('Error loading data: $e');
+      // Still navigate even if there's an error
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, "/home");
+      }
     }
   }
 

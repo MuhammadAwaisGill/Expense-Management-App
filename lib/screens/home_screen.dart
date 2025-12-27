@@ -36,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
       filtered = filtered.where((e) {
         try {
           final parts = e.date.split('/');
+          if (parts.length != 3) return false;
           final expenseMonth = int.parse(parts[1]);
           final expenseYear = int.parse(parts[2]);
           return expenseMonth == monthIndex && expenseYear == _selectedYear;
@@ -138,14 +139,17 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             onPressed: () => Navigator.pushNamed(context, '/about'),
             icon: const Icon(Icons.info),
+            tooltip: 'About',
           ),
           IconButton(
             onPressed: () => Navigator.pushNamed(context, '/manage_tags'),
             icon: const Icon(Icons.label_outline),
+            tooltip: 'Manage Tags',
           ),
           IconButton(
             onPressed: () => Navigator.pushNamed(context, '/manage_categories'),
             icon: const Icon(Icons.category_outlined),
+            tooltip: 'Manage Categories',
           ),
         ],
       ),
@@ -292,6 +296,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.pushNamed(context, '/expense_form'),
+        tooltip: 'Add Expense',
         child: const Icon(Icons.add),
       ),
     );
@@ -309,7 +314,24 @@ class ExpenseList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (expenses.isEmpty) {
-      return const Center(child: Text('No matching expenses found.'));
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.receipt_long_outlined, size: 80, color: Colors.grey[400]),
+            const SizedBox(height: 16),
+            Text(
+              'No expenses found',
+              style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Tap the + button to add your first expense',
+              style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+            ),
+          ],
+        ),
+      );
     }
 
     return Column(
@@ -377,11 +399,11 @@ class ExpenseList extends StatelessWidget {
                       leading: CircleAvatar(
                         backgroundColor: Color(expense.category.colorValue),
                         child: Text(
-                          expense.title[0].toUpperCase(),
+                          expense.title.isNotEmpty ? expense.title[0].toUpperCase() : '?',
                           style: const TextStyle(color: Colors.white),
                         ),
                       ),
-                      title: Text(expense.title, style: TextStyle(fontWeight: FontWeight.bold),),
+                      title: Text(expense.title, style: const TextStyle(fontWeight: FontWeight.bold)),
                       subtitle: Text('${expense.category.name} | Tag: ${expense.tag.name}'),
                       trailing: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,

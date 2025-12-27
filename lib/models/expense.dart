@@ -1,9 +1,7 @@
-
 import 'package:expense_management_app/models/tag.dart';
 import 'package:expense_management_app/models/category.dart';
 
 class Expense {
-
   int id;
   String title;
   double amount;
@@ -11,7 +9,7 @@ class Expense {
   Category category;
   Tag tag;
 
-  Expense ({
+  Expense({
     required this.id,
     required this.title,
     required this.amount,
@@ -33,12 +31,22 @@ class Expense {
 
   factory Expense.fromMap(Map<String, dynamic> map) {
     return Expense(
-      id: map['id'],
-      title: map['title'],
-      amount: map['amount'],
-      date: map['date'],
+      id: map['id'] as int,
+      title: map['title'] as String,
+      amount: (map['amount'] as num).toDouble(),
+      date: map['date'] as String,
       category: Category.fromMap(Map<String, dynamic>.from(map['category'])),
       tag: Tag.fromMap(Map<String, dynamic>.from(map['tag'])),
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is Expense &&
+              runtimeType == other.runtimeType &&
+              id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }

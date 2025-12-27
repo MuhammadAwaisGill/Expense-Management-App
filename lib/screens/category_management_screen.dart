@@ -38,6 +38,14 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
   }
 
   Future<void> _confirmAndDeleteCategory(BuildContext context, Category category) async {
+    // Prevent deletion of default category
+    if (category.id == -1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Cannot delete the default "Uncategorized" category.')),
+      );
+      return;
+    }
+
     final bool? shouldDelete = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -65,6 +73,14 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
   }
 
   void _showCategoryForm({Category? category}) {
+    // Prevent editing of default category
+    if (category != null && category.id == -1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Cannot edit the default "Uncategorized" category.')),
+      );
+      return;
+    }
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -110,13 +126,20 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                   itemCount: categories.length,
                   itemBuilder: (context, index) {
                     final category = categories[index];
+                    final isDefault = category.id == -1;
+
                     return ListTile(
                       leading: CircleAvatar(
                         backgroundColor: Color(category.colorValue),
                         radius: 12,
                       ),
                       title: Text(category.name),
-                      trailing: Row(
+                      trailing: isDefault
+                          ? const Chip(
+                        label: Text('Default', style: TextStyle(fontSize: 10)),
+                        backgroundColor: Colors.grey,
+                      )
+                          : Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(

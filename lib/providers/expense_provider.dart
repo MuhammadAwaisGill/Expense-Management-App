@@ -46,100 +46,193 @@ class ExpenseProvider extends ChangeNotifier {
   }
 
   Future<void> loadData() async {
-    _expenses = await StorageService.loadExpenses();
-    _categories = await StorageService.loadCategories();
-    _tags = await StorageService.loadTags();
+    try {
+      _expenses = await StorageService.loadExpenses();
+      _categories = await StorageService.loadCategories();
+      _tags = await StorageService.loadTags();
 
-    if (_categories.isEmpty) {
-      _categories.addAll(_defaultCategories);
-      await StorageService.saveCategories(_categories);
+      if (_categories.isEmpty) {
+        _categories.addAll(_defaultCategories);
+        await StorageService.saveCategories(_categories);
+      }
+
+      if (_tags.isEmpty) {
+        _tags.addAll(_defaultTags);
+        await StorageService.saveTags(_tags);
+      }
+
+      notifyListeners();
+    } catch (e) {
+      // Log error or handle it appropriately
+      debugPrint('Error loading data: $e');
     }
-
-    if (_tags.isEmpty) {
-      _tags.addAll(_defaultTags);
-      await StorageService.saveTags(_tags);
-    }
-
-    notifyListeners();
   }
 
   Future<void> addExpense(Expense expense) async {
-    _expenses.add(expense);
-    await StorageService.saveExpenses(_expenses);
-    notifyListeners();
+    try {
+      _expenses.add(expense);
+      await StorageService.saveExpenses(_expenses);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error adding expense: $e');
+      rethrow;
+    }
   }
 
   Future<void> deleteExpense(int id) async {
-    _expenses.removeWhere((e) => e.id == id);
-    await StorageService.saveExpenses(_expenses);
-    notifyListeners();
+    try {
+      _expenses.removeWhere((e) => e.id == id);
+      await StorageService.saveExpenses(_expenses);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error deleting expense: $e');
+      rethrow;
+    }
   }
 
   Future<void> addCategory(Category category) async {
-    _categories.add(category);
-    await StorageService.saveCategories(_categories);
-    notifyListeners();
+    try {
+      _categories.add(category);
+      await StorageService.saveCategories(_categories);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error adding category: $e');
+      rethrow;
+    }
   }
 
   Future<void> deleteCategory(int id) async {
-    final deleted = _categories.firstWhere(
-            (c) => c.id == id,
-        orElse: () => Category(id: -1, name: "", colorValue: 0xFFFF0000)
-    );
-    if (deleted.id == -1) return;
+    try {
+      final deleted = _categories.firstWhere(
+              (c) => c.id == id,
+          orElse: () => Category(id: -1, name: "", colorValue: 0xFFFF0000)
+      );
+      if (deleted.id == -1) return;
 
-    for (var e in _expenses) {
-      if (e.category.id == id) {
-        e.category = _defaultCategory;
+      // Create new expense objects with updated category instead of mutating
+      for (int i = 0; i < _expenses.length; i++) {
+        if (_expenses[i].category.id == id) {
+          _expenses[i] = Expense(
+            id: _expenses[i].id,
+            title: _expenses[i].title,
+            amount: _expenses[i].amount,
+            date: _expenses[i].date,
+            category: _defaultCategory,
+            tag: _expenses[i].tag,
+          );
+        }
       }
-    }
 
-    _categories.removeWhere((c) => c.id == id);
-    await StorageService.saveCategories(_categories);
-    await StorageService.saveExpenses(_expenses);
-    notifyListeners();
+      _categories.removeWhere((c) => c.id == id);
+      await StorageService.saveCategories(_categories);
+      await StorageService.saveExpenses(_expenses);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error deleting category: $e');
+      rethrow;
+    }
   }
 
   Future<void> updateCategory(Category updatedCategory) async {
-    final index = _categories.indexWhere((c) => c.id == updatedCategory.id);
-    if (index != -1) {
-      _categories[index] = updatedCategory;
-      await StorageService.saveCategories(_categories);
-      notifyListeners();
+    try {
+      final index = _categories.indexWhere((c) => c.id == updatedCategory.id);
+      if (index != -1) {
+        _categories[index] = updatedCategory;
+
+        // Update all expenses that reference this category
+        for (int i = 0; i < _expenses.length; i++) {
+          if (_expenses[i].category.id == updatedCategory.id) {
+            _expenses[i] = Expense(
+              id: _expenses[i].id,
+              title: _expenses[i].title,
+              amount: _expenses[i].amount,
+              date: _expenses[i].date,
+              category: updatedCategory,
+              tag: _expenses[i].tag,
+            );
+          }
+        }
+
+        await StorageService.saveCategories(_categories);
+        await StorageService.saveExpenses(_expenses);
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Error updating category: $e');
+      rethrow;
     }
   }
 
   Future<void> addTag(Tag tag) async {
-    _tags.add(tag);
-    await StorageService.saveTags(_tags);
-    notifyListeners();
+    try {
+      _tags.add(tag);
+      await StorageService.saveTags(_tags);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error adding tag: $e');
+      rethrow;
+    }
   }
 
   Future<void> deleteTag(int id) async {
-    final deleted = _tags.firstWhere(
-            (t) => t.id == id,
-        orElse: () => Tag(id: -1, name: "")
-    );
-    if (deleted.id == -1) return;
+    try {
+      final deleted = _tags.firstWhere(
+              (t) => t.id == id,
+          orElse: () => Tag(id: -1, name: "")
+      );
+      if (deleted.id == -1) return;
 
-    for (var e in _expenses) {
-      if (e.tag.id == id) {
-        e.tag = _defaultTag;
+      // Create new expense objects with updated tag instead of mutating
+      for (int i = 0; i < _expenses.length; i++) {
+        if (_expenses[i].tag.id == id) {
+          _expenses[i] = Expense(
+            id: _expenses[i].id,
+            title: _expenses[i].title,
+            amount: _expenses[i].amount,
+            date: _expenses[i].date,
+            category: _expenses[i].category,
+            tag: _defaultTag,
+          );
+        }
       }
-    }
 
-    _tags.removeWhere((t) => t.id == id);
-    await StorageService.saveTags(_tags);
-    await StorageService.saveExpenses(_expenses);
-    notifyListeners();
+      _tags.removeWhere((t) => t.id == id);
+      await StorageService.saveTags(_tags);
+      await StorageService.saveExpenses(_expenses);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error deleting tag: $e');
+      rethrow;
+    }
   }
 
   Future<void> updateTag(Tag updatedTag) async {
-    final index = _tags.indexWhere((t) => t.id == updatedTag.id);
-    if (index != -1) {
-      _tags[index] = updatedTag;
-      await StorageService.saveTags(_tags);
-      notifyListeners();
+    try {
+      final index = _tags.indexWhere((t) => t.id == updatedTag.id);
+      if (index != -1) {
+        _tags[index] = updatedTag;
+
+        // Update all expenses that reference this tag
+        for (int i = 0; i < _expenses.length; i++) {
+          if (_expenses[i].tag.id == updatedTag.id) {
+            _expenses[i] = Expense(
+              id: _expenses[i].id,
+              title: _expenses[i].title,
+              amount: _expenses[i].amount,
+              date: _expenses[i].date,
+              category: _expenses[i].category,
+              tag: updatedTag,
+            );
+          }
+        }
+
+        await StorageService.saveTags(_tags);
+        await StorageService.saveExpenses(_expenses);
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Error updating tag: $e');
+      rethrow;
     }
   }
 
