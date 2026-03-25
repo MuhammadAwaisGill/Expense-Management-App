@@ -12,6 +12,7 @@
 .swiftpm/
 migrate_working_dir/
 android/key.properties
+android/app/tracksy-release.jks
 tracksy-release.jks
 # IntelliJ related
 *.iml
