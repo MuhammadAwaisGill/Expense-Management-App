@@ -29,7 +29,7 @@ class ExpenseManager extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => ExpenseProvider(),
       child: MaterialApp(
-        title: "Expense Manager",
+        title: "Tracksy",
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.green,
