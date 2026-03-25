@@ -1,7 +1,7 @@
-import 'package:expense_management_app/models/category.dart';
-import 'package:expense_management_app/models/tag.dart';
-import 'package:expense_management_app/models/expense.dart';
-import 'package:expense_management_app/providers/expense_provider.dart';
+import 'package:tracksy/models/category.dart';
+import 'package:tracksy/models/tag.dart';
+import 'package:tracksy/models/expense.dart';
+import 'package:tracksy/providers/expense_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -131,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Expense Manager"),
+        title: const Text("Tracksy"),
         centerTitle: true,
         backgroundColor: Colors.grey.shade300,
         elevation: 2,

@@ -1,7 +1,7 @@
-import 'package:expense_management_app/models/category.dart';
-import 'package:expense_management_app/models/expense.dart';
-import 'package:expense_management_app/models/tag.dart';
-import 'package:expense_management_app/utils/storage_service.dart';
+import 'package:tracksy/models/category.dart';
+import 'package:tracksy/models/expense.dart';
+import 'package:tracksy/models/tag.dart';
+import 'package:tracksy/utils/storage_service.dart';
 import 'package:flutter/material.dart';
 
 class ExpenseProvider extends ChangeNotifier {

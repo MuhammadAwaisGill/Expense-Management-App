@@ -1,10 +1,10 @@
-import 'package:expense_management_app/providers/expense_provider.dart';
-import 'package:expense_management_app/screens/about_screen.dart';
-import 'package:expense_management_app/screens/add_expense_screen.dart';
-import 'package:expense_management_app/screens/category_management_screen.dart';
-import 'package:expense_management_app/screens/home_screen.dart';
-import 'package:expense_management_app/screens/splash_screen.dart';
-import 'package:expense_management_app/screens/tag_management_screen.dart';
+import 'package:tracksy/providers/expense_provider.dart';
+import 'package:tracksy/screens/about_screen.dart';
+import 'package:tracksy/screens/add_expense_screen.dart';
+import 'package:tracksy/screens/category_management_screen.dart';
+import 'package:tracksy/screens/home_screen.dart';
+import 'package:tracksy/screens/splash_screen.dart';
+import 'package:tracksy/screens/tag_management_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';

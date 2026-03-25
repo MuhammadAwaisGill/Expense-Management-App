@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:expense_management_app/providers/expense_provider.dart';
+import 'package:tracksy/providers/expense_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -108,7 +108,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               FadeTransition(
                 opacity: _fadeAnimation,
                 child: const Text(
-                  "Expense Management",
+                  "T R A C K S Y",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 32,

@@ -41,7 +41,7 @@ class AboutScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Expense Tracker',
+                    'Tracksy',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -79,7 +79,7 @@ class AboutScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 180.0),
                 child: Text(
-                  '© 2025 Expense Tracker',
+                  '© 2025 Tracksy',
                   style: Theme.of(context).textTheme.labelSmall,
                 ),
               ),

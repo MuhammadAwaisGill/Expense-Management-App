@@ -1,5 +1,5 @@
-import 'package:expense_management_app/models/tag.dart';
-import 'package:expense_management_app/models/category.dart';
+import 'package:tracksy/models/tag.dart';
+import 'package:tracksy/models/category.dart';
 
 class Expense {
   int id;
